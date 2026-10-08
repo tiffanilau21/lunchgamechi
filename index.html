@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chiikawa Lunch Roulette ✨</title>
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'M PLUS Rounded 1c', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #fff5f8 0%, #fffde6 100%);
+            color: #555;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 500px;
+            width: 100%;
+            background: #ffffff;
+            border-radius: 30px;
+            box-shadow: 0 10px 30px rgba(255, 182, 193, 0.4);
+            border: 4px solid #ffccd5;
+            padding: 30px 20px;
+            text-align: center;
+            position: relative;
+        }
+
+        h1 {
+            color: #ff758c;
+            font-size: 26px;
+            font-weight: 800;
+            margin-bottom: 5px;
+            text-shadow: 2px 2px 0px #ffe5ec;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: #888;
+            margin-bottom: 25px;
+        }
+
+        /* Restaurant Wheel Grid */
+        .wheel-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .wheel-item {
+            background: #fff9fb;
+            border: 3px solid #ffdeeb;
+            border-radius: 20px;
+            padding: 15px 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: all 0.2s ease;
+        }
+
+        .wheel-item.full-width {
+            grid-column: span 2;
+            width: 60%;
+            margin: 0 auto;
+        }
+
+        .wheel-item.active {
+            background: #fff0f3;
+            border-color: #ff758c;
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(255, 117, 140, 0.3);
+        }
+
+        .chiikawa-icon {
+            font-size: 36px;
+            margin-bottom: 8px;
+            animation: float 2s ease-in-out infinite;
+        }
+
+        .wheel-item:nth-child(even) .chiikawa-icon {
+            animation-delay: 1s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        .restaurant-name {
+            font-weight: 700;
+            font-size: 16px;
+            color: #444;
+        }
+
+        .character-tag {
+            font-size: 11px;
+            background: #ffe5ec;
+            color: #ff5c8a;
+            padding: 2px 8px;
+            border-radius: 10px;
+            margin-top: 5px;
+            font-weight: 700;
+        }
+
+        /* Spin Button */
+        .spin-btn {
+            background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 99%, #fad0c4 100%);
+            background: linear-gradient(135deg, #ff758c 0%, #ff7eb3 100%);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 15px 40px;
+            font-size: 20px;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 0 6px 20px rgba(255, 117, 140, 0.4);
+            transition: all 0.2s ease;
+            outline: none;
+            letter-spacing: 1px;
+        }
+
+        .spin-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 117, 140, 0.6);
+        }
+
+        .spin-btn:active {
+            transform: translateY(1px);
+        }
+
+        .spin-btn:disabled {
+            background: #e0e0e0;
+            box-shadow: none;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Result Popup Overlay */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(3px);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 35px 25px;
+            border-radius: 30px;
+            border: 4px solid #ffccd5;
+            text-align: center;
+            max-width: 350px;
+            width: 100%;
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0.5); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .modal-icon {
+            font-size: 60px;
+            margin-bottom: 10px;
+        }
+
+        .modal h2 {
+            color: #ff758c;
+            font-size: 22px;
+            margin-bottom: 5px;
+        }
+
+        .modal-restaurant {
+            font-size: 28px;
+            font-weight: 800;
+            color: #333;
+            margin: 15px 0;
+            background: #fff5f8;
+            padding: 10px;
+            border-radius: 15px;
+            border: 2px dashed #ffb3c6;
+        }
+
+        .close-btn {
+            background: #ff758c;
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: background 0.2s;
+        }
+
+        .close-btn:hover {
+            background: #ff5c77;
+        }
+
+        .footer-note {
+            margin-top: 20px;
+            font-size: 12px;
+            color: #aaa;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>🌸 Chiikawa Lunch Roulette 🌸</h1>
+        <p class="subtitle">Let the cute characters pick today's delicious meal!</p>
+
+        <div class="wheel-grid" id="wheelGrid">
+            <div class="wheel-item" data-index="0">
+                <div class="chiikawa-icon">🐹</div>
+                <div class="restaurant-name">魚米</div>
+                <div class="character-tag">Chiikawa</div>
+            </div>
+            <div class="wheel-item" data-index="1">
+                <div class="chiikawa-icon">🐱</div>
+                <div class="restaurant-name">金飯碗</div>
+                <div class="character-tag">Hachiware</div>
+            </div>
+            <div class="wheel-item" data-index="2">
+                <div class="chiikawa-icon">🐰</div>
+                <div class="restaurant-name">三一餃子</div>
+                <div class="character-tag">Usagi</div>
+            </div>
+            <div class="wheel-item" data-index="3">
+                <div class="chiikawa-icon">🐿️</div>
+                <div class="restaurant-name">魚川居</div>
+                <div class="character-tag">Momonga</div>
+            </div>
+            <div class="wheel-item full-width" data-index="4">
+                <div class="chiikawa-icon">🍻</div>
+                <div class="restaurant-name">幸福胖</div>
+                <div class="character-tag">Kurimanju</div>
+            </div>
+        </div>
+
+        <button class="spin-btn" id="spinBtn" onclick="startRoulette()">✨ SPIN LUNCH ✨</button>
+        <div class="footer-note">Have a wonderful lunch time! ٩(ˊᗜˋ*)و</div>
+    </div>
+
+    <!-- Result Modal -->
+    <div class="modal" id="resultModal">
+        <div class="modal-content">
+            <div class="modal-icon" id="modalIcon">🎉</div>
+            <h2>Today's Lucky Lunch!</h2>
+            <div class="modal-restaurant" id="modalRestaurantName">魚米</div>
+            <p id="modalCharacterText" style="font-size: 13px; color: #666;">Chosen with love!</p>
+            <button class="close-btn" onclick="closeModal()">Yay! Let's go! ✨</button>
+        </div>
+    </div>
+
+    <script>
+        const restaurants = [
+            { name: "魚米", character: "Chiikawa", icon: "🐹" },
+            { name: "金飯碗", character: "Hachiware", icon: "🐱" },
+            { name: "三一餃子", character: "Usagi", icon: "🐰" },
+            { name: "魚川居", character: "Momonga", icon: "🐿️" },
+            { name: "幸福胖", character: "Kurimanju", icon: "🍻" }
+        ];
+
+        // Web Audio API Sound Generator
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playSound(type) {
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+            const osc = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            osc.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+
+            if (type === 'tick') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(600, audioCtx.currentTime);
+                gainNode.gain.setValueAtTime(0.05, audioCtx.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.08);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.08);
+            } else if (type === 'win') {
+                // Happy jingle
+                const now = audioCtx.currentTime;
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(523.25, now); // C5
+                osc.frequency.setValueAtTime(659.25, now + 0.1); // E5
+                osc.frequency.setValueAtTime(783.99, now + 0.2); // G5
+                osc.frequency.setValueAtTime(1046.50, now + 0.3); // C6
+                
+                gainNode.gain.setValueAtTime(0.1, now);
+                gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
+                osc.start(now);
+                osc.stop(now + 0.6);
+            }
+        }
+
+        function startRoulette() {
+            const spinBtn = document.getElementById('spinBtn');
+            const items = document.querySelectorAll('.wheel-item');
+            spinBtn.disabled = true;
+
+            let currentIndex = 0;
+            let rounds = 3;
+            let totalSteps = (rounds * restaurants.length) + Math.floor(Math.random() * restaurants.length);
+            let currentStep = 0;
+            let speed = 50;
+
+            function spinStep() {
+                items.forEach(item => item.classList.remove('active'));
+                
+                let activeIdx = currentStep % restaurants.length;
+                items[activeIdx].classList.add('active');
+                playSound('tick');
+
+                currentStep++;
+
+                if (currentStep < totalSteps) {
+                    // Slow down gradually towards the end
+                    if (currentStep > totalSteps - 8) {
+                        speed += 30;
+                    }
+                    setTimeout(spinStep, speed);
+                } else {
+                    // Finished spinning
+                    playSound('win');
+                    setTimeout(() => {
+                        showResult(activeIdx);
+                        spinBtn.disabled = false;
+                    }, 400);
+                }
+            }
+
+            spinStep();
+        }
+
+        function showResult(index) {
+            const res = restaurants[index];
+            document.getElementById('modalIcon').innerText = res.icon;
+            document.getElementById('modalRestaurantName').innerText = res.name;
+            document.getElementById('modalCharacterText').innerText = `${res.character} picked this delicious spot for you!`;
+            document.getElementById('resultModal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('resultModal').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
